@@ -14,6 +14,7 @@ import {
   DialogActions
 } from "@mui/material";
 import styles from "./AddDialog.module.css";
+import { useModal } from "./ModalContext"
 
 export const AddDialog = (props) => {
   const [text, setText] = useState("");
@@ -21,9 +22,13 @@ export const AddDialog = (props) => {
   const [parent, setParent] = useState(0);
   const [droppable, setDroppable] = useState(false);
 
+  const { changeModal, state } = useModal()
+
   const handleChangeText = (e) => {
     setText(e.target.value);
   };
+
+  const { isModalOpened } = state
 
   const handleChangeParent = (e) => {
     setParent(Number(e.target.value));
@@ -37,6 +42,8 @@ export const AddDialog = (props) => {
     setFileType(e.target.value);
   };
 
+  if (!isModalOpened) return null
+
   return (
     <Dialog open={true} onClose={props.onClose}>
       <DialogTitle>Add New Node</DialogTitle>
@@ -47,7 +54,7 @@ export const AddDialog = (props) => {
         <div>
           <FormControl className={styles.select}>
             <InputLabel>Parent</InputLabel>
-            <Select label="Parent" onChange={handleChangeParent} value={parent}>
+            <Select label="Parent" onChange={handleChangeParent} value={state.parentID}>
               <MenuItem value={0}>(root)</MenuItem>
               {props.tree
                 .filter((node) => node.droppable === true)
@@ -89,7 +96,7 @@ export const AddDialog = (props) => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose}>Cancel</Button>
+        <Button onClick={changeModal}>Cancel</Button>
         <Button
           disabled={text === ""}
           onClick={() =>

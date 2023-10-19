@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useContext } from "react";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
@@ -9,13 +9,17 @@ import { ArrowRight, Delete, FileCopy } from "@mui/icons-material";
 import { useDragOver } from "@minoru/react-dnd-treeview";
 import { TypeIcon } from "./TypeIcon";
 import styles from "./CustomNode.module.css";
+import AddIcon from "@mui/icons-material/Add";
+import { useModal } from "./ModalContext"
 
 export const CustomNode = (props) => {
   const [hover, setHover] = useState(false);
-  const { id, text, onTextChange, droppable, data } = props.node;
+  const { id, text, droppable, data } = props.node;
   const [visibleInput, setVisibleInput] = useState(false);
   const [labelText, setLabelText] = useState(text);
   const indent = props.depth * 24;
+
+  const { changeModal } = useModal()
 
   const handleToggle = (e) => {
     e.stopPropagation();
@@ -93,6 +97,9 @@ export const CustomNode = (props) => {
             </IconButton>
             <IconButton size="small" onClick={handleShowInput}>
               <EditIcon fontSize="small" />
+            </IconButton>
+            <IconButton size="small" onClick={() => { console.log(123); changeModal() }}>
+              <AddIcon fontSize="small" />
             </IconButton>
           </div>
         </>

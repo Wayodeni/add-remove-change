@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -15,6 +15,7 @@ import { AddDialog } from "./AddDialog";
 import { theme } from "./theme";
 import styles from "./App.module.css";
 import SampleData from "./sample_data.json";
+import ModalContextProvider, { useModal } from "./ModalContext"
 
 const getLastId = (treeData) => {
   const reversedArray = [...treeData].sort((a, b) => {
@@ -37,7 +38,8 @@ const getLastId = (treeData) => {
 function App() {
   const [treeData, setTreeData] = useState(SampleData);
   const handleDrop = (newTree) => setTreeData(newTree);
-  const [open, setOpen] = useState(false);
+
+  const { changeModal } = useModal()
 
   const handleDelete = (id) => {
     const deleteIds = [
@@ -47,14 +49,6 @@ function App() {
     const newTree = treeData.filter((node) => !deleteIds.includes(node.id));
 
     setTreeData(newTree);
-  };
-
-  const handleOpenDialog = () => {
-    setOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpen(false);
   };
 
   const handleSubmit = (newNode) => {
@@ -90,43 +84,42 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-        <div className={styles.app}>
-          <div>
-            <Button onClick={handleOpenDialog} startIcon={<AddIcon />}>
-              Add Node
-            </Button>
-            {open && (
+        <ModalContextProvider>
+          <div className={styles.app}>
+            <div>
+              <Button onClick={changeModal} startIcon={<AddIcon />}>
+                Add Node
+              </Button>
               <AddDialog
                 tree={treeData}
-                onClose={handleCloseDialog}
                 onSubmit={handleSubmit}
               />
-            )}
+            </div>
+            <Tree
+              tree={treeData}
+              rootId={0}
+              render={(node, options) => (
+                <CustomNode
+                  node={node}
+                  {...options}
+                  onDelete={handleDelete}
+                  onTextChange={handleTextChange}
+                />
+              )}
+              dragPreviewRender={(monitorProps) => (
+                <CustomDragPreview monitorProps={monitorProps} />
+              )}
+              onDrop={handleDrop}
+              classes={{
+                root: styles.treeRoot,
+                draggingSource: styles.draggingSource,
+                dropTarget: styles.dropTarget
+              }}
+            />
           </div>
-          <Tree
-            tree={treeData}
-            rootId={0}
-            render={(node, options) => (
-              <CustomNode
-                node={node}
-                {...options}
-                onDelete={handleDelete}
-                onTextChange={handleTextChange}
-              />
-            )}
-            dragPreviewRender={(monitorProps) => (
-              <CustomDragPreview monitorProps={monitorProps} />
-            )}
-            onDrop={handleDrop}
-            classes={{
-              root: styles.treeRoot,
-              draggingSource: styles.draggingSource,
-              dropTarget: styles.dropTarget
-            }}
-          />
-        </div>
+        </ModalContextProvider>
       </DndProvider>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }
 
