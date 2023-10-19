@@ -15,7 +15,7 @@ import { AddDialog } from "./AddDialog";
 import { theme } from "./theme";
 import styles from "./App.module.css";
 import SampleData from "./sample_data.json";
-import ModalContextProvider, { useModal } from "./ModalContext"
+import ModalContext from "./ModalContext"
 
 const getLastId = (treeData) => {
   const reversedArray = [...treeData].sort((a, b) => {
@@ -39,8 +39,6 @@ function App() {
   const [treeData, setTreeData] = useState(SampleData);
   const handleDrop = (newTree) => setTreeData(newTree);
 
-  const { changeModal } = useModal()
-
   const handleDelete = (id) => {
     const deleteIds = [
       id,
@@ -62,7 +60,7 @@ function App() {
       }
     ]);
 
-    setOpen(false);
+    setIsModalOpen(!isModalOpen)
   };
 
   const handleTextChange = (id, value) => {
@@ -80,20 +78,27 @@ function App() {
     setTreeData(newTree);
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [parentID, setParentID] = useState(null)
+
+  const value = { isModalOpen, setIsModalOpen, parentID, setParentID }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-        <ModalContextProvider>
+        <ModalContext.Provider value={value}>
           <div className={styles.app}>
             <div>
-              <Button onClick={changeModal} startIcon={<AddIcon />}>
+              <Button onClick={() => setIsModalOpen(!isModalOpen)} startIcon={<AddIcon />}>
                 Add Node
               </Button>
-              <AddDialog
-                tree={treeData}
-                onSubmit={handleSubmit}
-              />
+              {isModalOpen && (
+                <AddDialog
+                  tree={treeData}
+                  onSubmit={handleSubmit}
+                />
+              )}
             </div>
             <Tree
               tree={treeData}
@@ -117,7 +122,7 @@ function App() {
               }}
             />
           </div>
-        </ModalContextProvider>
+        </ModalContext.Provider>
       </DndProvider>
     </ThemeProvider >
   );

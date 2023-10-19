@@ -10,7 +10,7 @@ import { useDragOver } from "@minoru/react-dnd-treeview";
 import { TypeIcon } from "./TypeIcon";
 import styles from "./CustomNode.module.css";
 import AddIcon from "@mui/icons-material/Add";
-import { useModal } from "./ModalContext"
+import ModalContext from "./ModalContext"
 
 export const CustomNode = (props) => {
   const [hover, setHover] = useState(false);
@@ -18,8 +18,6 @@ export const CustomNode = (props) => {
   const [visibleInput, setVisibleInput] = useState(false);
   const [labelText, setLabelText] = useState(text);
   const indent = props.depth * 24;
-
-  const { changeModal } = useModal()
 
   const handleToggle = (e) => {
     e.stopPropagation();
@@ -45,6 +43,8 @@ export const CustomNode = (props) => {
   };
 
   const dragOverProps = useDragOver(id, props.isOpen, props.onToggle);
+
+  const { isModalOpen, setIsModalOpen, parentID, setParentID } = useContext(ModalContext)
 
   return (
     <div
@@ -98,9 +98,14 @@ export const CustomNode = (props) => {
             <IconButton size="small" onClick={handleShowInput}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" onClick={() => { console.log(123); changeModal() }}>
-              <AddIcon fontSize="small" />
-            </IconButton>
+            {droppable && (
+              <IconButton size="small" onClick={() => {
+                setIsModalOpen(!isModalOpen);
+                setParentID(props.node.id);
+              }}>
+                <AddIcon fontSize="small" />
+              </IconButton>
+            )}
           </div>
         </>
       )}
