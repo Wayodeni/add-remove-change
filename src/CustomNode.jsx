@@ -64,8 +64,7 @@ export const CustomNode = (props) => {
         {visibleInput ? (
           <div className={styles.inputWrapper}>
             <TextField
-              className={`${styles.textField}
-              ${styles.nodeInput}`}
+              className={`${styles.textField}`}
               value={labelText}
               onChange={handleChangeText}
             />
