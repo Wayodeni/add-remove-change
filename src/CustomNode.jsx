@@ -1,16 +1,16 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import { ArrowRight, Delete, FileCopy } from "@mui/icons-material";
+import { ArrowRight, Delete } from "@mui/icons-material";
 import { useDragOver } from "@minoru/react-dnd-treeview";
 import { TypeIcon } from "./TypeIcon";
 import styles from "./CustomNode.module.css";
 import AddIcon from "@mui/icons-material/Add";
-import ModalContext from "./ModalContext"
+import { useModal } from "./ModalContext";
 
 export const CustomNode = (props) => {
   const [hover, setHover] = useState(false);
@@ -44,7 +44,7 @@ export const CustomNode = (props) => {
 
   const dragOverProps = useDragOver(id, props.isOpen, props.onToggle);
 
-  const { isModalOpen, setIsModalOpen, parentID, setParentID } = useContext(ModalContext)
+  const { changeModalOpened, setParentID } = useModal();
 
   return (
     <div
@@ -54,7 +54,10 @@ export const CustomNode = (props) => {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <div className={`${styles.expandIconWrapper} ${props.isOpen ? styles.isOpen : ""}`}>
+      <div
+        className={`${styles.expandIconWrapper} ${props.isOpen ? styles.isOpen : ""
+          }`}
+      >
         {props.node.droppable && (
           <div onClick={handleToggle}>
             <ArrowRight />
@@ -99,10 +102,13 @@ export const CustomNode = (props) => {
               <EditIcon fontSize="small" />
             </IconButton>
             {droppable && (
-              <IconButton size="small" onClick={() => {
-                setIsModalOpen(!isModalOpen);
-                setParentID(props.node.id);
-              }}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  changeModalOpened();
+                  setParentID(id);
+                }}
+              >
                 <AddIcon fontSize="small" />
               </IconButton>
             )}

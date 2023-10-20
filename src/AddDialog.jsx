@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Select,
@@ -11,11 +11,10 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
 } from "@mui/material";
 import styles from "./AddDialog.module.css";
-import ModalContext from "./ModalContext"
-import Typography from "@mui/material/Typography";
+import { useModal } from "./ModalContext";
 
 export const AddDialog = (props) => {
   const [text, setText] = useState("");
@@ -38,7 +37,7 @@ export const AddDialog = (props) => {
     setFileType(e.target.value);
   };
 
-  const { isModalOpen, setIsModalOpen, parentID, setParentID } = useContext(ModalContext)
+  const { state, setParentID, changeModalOpened } = useModal();
 
   return (
     <Dialog open={true} onClose={props.onClose}>
@@ -50,7 +49,11 @@ export const AddDialog = (props) => {
         <div>
           <FormControl className={styles.select}>
             <InputLabel>Parent</InputLabel>
-            <Select label="Parent" onChange={handleChangeParent} value={parentID || 0}>
+            <Select
+              label="Parent"
+              onChange={handleChangeParent}
+              value={state.parentID}
+            >
               <MenuItem value={0}>(root)</MenuItem>
               {props.tree
                 .filter((node) => node.droppable === true)
@@ -92,17 +95,17 @@ export const AddDialog = (props) => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setIsModalOpen(!isModalOpen)}>Cancel</Button>
+        <Button onClick={changeModalOpened}>Cancel</Button>
         <Button
           disabled={text === ""}
           onClick={() =>
             props.onSubmit({
               text,
-              parent: parentID,
+              parent: state.parentID,
               droppable,
               data: {
-                fileType
-              }
+                fileType,
+              },
             })
           }
         >
